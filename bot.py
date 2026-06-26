@@ -14,7 +14,10 @@ class Bot:
     def __init__(self):
         self.config_manager = ConfigManager()
         active = self.config_manager.get_active_config()
-        self.firebase_manager = FirebaseManager(active["url"]) if active else None
+        if active:
+            self.firebase_manager = FirebaseManager(active["url"])
+        else:
+            self.firebase_manager = None
         self.setup_app()
 
     def setup_app(self):
@@ -41,6 +44,6 @@ class Bot:
 
 if __name__ == "__main__":
     if not BOT_TOKEN:
-        print("❌ BOT_TOKEN not set!")
+        print("❌ BOT_TOKEN not set! Please add it in Render environment variables.")
     else:
         Bot().run()
