@@ -1,5 +1,5 @@
 import logging
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Application, CommandHandler
 from config_manager import ConfigManager
 from firebase_config import FirebaseManager
 from commands import CommandHandler as BotCommands
@@ -18,11 +18,10 @@ class Bot:
             self.firebase_manager = FirebaseManager(active["url"])
         else:
             self.firebase_manager = None
-        self.setup_handlers()
+        self.setup_app()
 
-    def setup_handlers(self):
-        self.updater = Updater(token=BOT_TOKEN, use_context=True)
-        dp = self.updater.dispatcher
+    def setup_app(self):
+        self.app = Application.builder().token(BOT_TOKEN).build()
         cmd = BotCommands(self.config_manager, self.firebase_manager)
         handlers = [
             ("start", cmd.start_command),
@@ -37,12 +36,11 @@ class Bot:
             ("help", cmd.help_command),
         ]
         for name, func in handlers:
-            dp.add_handler(CommandHandler(name, func))
+            self.app.add_handler(CommandHandler(name, func))
 
     def run(self):
         logger.info("Bot is running...")
-        self.updater.start_polling()
-        self.updater.idle()
+        self.app.run_polling()
 
 if __name__ == "__main__":
     if not BOT_TOKEN:
