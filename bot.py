@@ -8,17 +8,17 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")  # Render se lega
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 class Bot:
     def __init__(self):
         self.config_manager = ConfigManager()
         active = self.config_manager.get_active_config()
         self.firebase_manager = FirebaseManager(active["url"]) if active else None
-        self.app = Application.builder().token(BOT_TOKEN).build()
-        self.setup_handlers()
+        self.setup_app()
 
-    def setup_handlers(self):
+    def setup_app(self):
+        self.app = Application.builder().token(BOT_TOKEN).build()
         cmd = BotCommands(self.config_manager, self.firebase_manager)
         handlers = [
             ("start", cmd.start_command),
@@ -41,6 +41,6 @@ class Bot:
 
 if __name__ == "__main__":
     if not BOT_TOKEN:
-        print("❌ BOT_TOKEN not set! Please add it in Render environment variables.")
+        print("❌ BOT_TOKEN not set!")
     else:
         Bot().run()
